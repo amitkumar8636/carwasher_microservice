@@ -4,27 +4,25 @@ import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.DBRef;
 import org.springframework.data.mongodb.core.mapping.Document;
 
+import lombok.AllArgsConstructor;
+import lombok.Data;
+
+@Data
+@AllArgsConstructor
 @Document
 public class Rating {
 
-	@Id
-	private String id;
+	
 	private String reviews;
 	private int ratings;
-
-	@DBRef
-	private int orderid;
-
-	public Rating(String reviews, int ratings, int orderid) {
+	
+	public Rating(String reviews, int ratings) {
 		super();
 		this.reviews = reviews;
 		this.ratings = ratings;
-		this.orderid = orderid;
 	}
 
-	public String getId() {
-		return id;
-	}
+	
 
 	public String getReviews() {
 		return reviews;
@@ -41,13 +39,9 @@ public class Rating {
 	public void setRatings(int ratings) {
 		this.ratings = ratings;
 	}
+	
+	
 
-	public int getOrderid() {
-		return orderid;
-	}
-
-	public void setOrderid(int orderid) {
-		this.orderid = orderid;
-	}
+	
 
 }

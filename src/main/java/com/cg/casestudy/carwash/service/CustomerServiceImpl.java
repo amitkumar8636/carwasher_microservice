@@ -4,25 +4,43 @@ import org.json.JSONException;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.RequestBody;
 
+import com.cg.casestudy.carwash.document.Bookings;
 import com.cg.casestudy.carwash.document.Customer;
-import com.cg.casestudy.carwash.document.Order;
+import com.cg.casestudy.carwash.document.FutureBook;
+import com.cg.casestudy.carwash.document.Packages;
+import com.cg.casestudy.carwash.document.Rating;
+import com.cg.casestudy.carwash.document.Receipt;
 import com.cg.casestudy.carwash.document.User;
 import com.cg.casestudy.carwash.exception.CarwasherException;
+import com.cg.casestudy.carwash.repo.BookingRepo;
 import com.cg.casestudy.carwash.repo.CustomerRepo;
-import com.cg.casestudy.carwash.repo.OrderRepo;
+import com.cg.casestudy.carwash.repo.FutureBookRepo;
+import com.cg.casestudy.carwash.repo.PackageRepo;
+import com.cg.casestudy.carwash.repo.ReceiptRepo;
 import com.cg.casestudy.carwash.repo.UserRepo;
-import com.mongodb.MongoException;
 
 @Service
 public class CustomerServiceImpl implements CustomerService {
+
 	@Autowired
 	private CustomerRepo customerRepo;
 
 	@Autowired
 	private UserRepo userRepo;
+
 	@Autowired
-	private OrderRepo orderRepo;
+	private BookingRepo bookingRepo;
+
+	@Autowired
+	private FutureBookRepo futureBookRepo;
+
+	@Autowired
+	private ReceiptRepo receiptRepo;
+
+	@Autowired
+	private PackageRepo packageRepo;
 
 	@Override
 	public Customer signup(JSONObject object) {
@@ -32,7 +50,7 @@ public class CustomerServiceImpl implements CustomerService {
 				if (null == customerRepo.findByemail(object.getString("email"))) {
 					customer = new Customer(object.getString("name"), object.getString("email"), true, null);
 					customer = customerRepo.save(customer);
-					userRepo.save(new User(customer.getEmail(), "1234", true,"customer"));
+					userRepo.save(new User(customer.getEmail(), "1234", true, "customer"));
 				} else {
 					throw new CarwasherException("user Already exist");
 				}
@@ -45,29 +63,57 @@ public class CustomerServiceImpl implements CustomerService {
 
 	@Override
 	public Customer editProfile(Customer customer) {
-		Customer cust =  customerRepo.findByemail(customer.getEmail());
+		Customer cust = customerRepo.findByemail(customer.getEmail());
 		if (customer.getEmail().equals(cust.getEmail())) {
 			cust.setName(customer.getName());
 			customerRepo.save(cust);
 		}
-		return null;
+		return cust;
 	}
 
 	@Override
 	public boolean login(User user) {
-		return userRepo.findPasswordByEmail(user.getId()).equals(user.getPassword());
+		return new JSONObject(userRepo.findPasswordById(user.getId())).get("password").equals(user.getPassword());
 	}
 
 	@Override
-	public Order orderNow(Order customerOrder) {
-		Order order=null;
-		try {
-			order = orderRepo.save(customerOrder);
-		} catch (MongoException e) {
-			throw new CarwasherException("Unable to handle request with database",e);
+	public Bookings bookNow(Bookings booking) {
+		Bookings newbook = null;
+		if (booking.getCustomerEmail() == null) {
+			throw new CarwasherException("CustomerEmail cannot be null");
+		} else if (booking.getCleaningPackage() == null) {
+			throw new CarwasherException("Cleaning package must be selected");
+		} else if (booking.getCar().isEmpty()) {
+			throw new CarwasherException("Car must be selected");
+		} else {
+
+			newbook = bookingRepo.save(booking);
 		}
-		
-		return order;
+
+		return newbook;
+	}
+
+	@Override
+	public FutureBook scheduleBooking(FutureBook upcomingBookings) {
+		if (upcomingBookings.getDate() == null || upcomingBookings.getTime() == null) {
+			throw new CarwasherException("Date time Must be available");
+		}
+		return futureBookRepo.save(
+				new FutureBook(upcomingBookings.getBooking(), upcomingBookings.getDate(), upcomingBookings.getTime(),
+						upcomingBookings.getLatitude(), upcomingBookings.getLongitude(), "Not Assigned"));
+	}
+
+	@Override
+	public Receipt getReceipt(String id) {
+
+		return receiptRepo.findById(id).get();
+	}
+
+	@Override
+	public boolean giveRatings(Rating rating, String bookingId) {
+		Bookings booking = bookingRepo.findById(bookingId).get();
+		booking.setRating(rating);
+		return bookingRepo.save(booking).getClass() == Bookings.class;
 	}
 
 }

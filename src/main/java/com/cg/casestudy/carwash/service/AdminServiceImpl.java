@@ -3,10 +3,12 @@ package com.cg.casestudy.carwash.service;
 import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 import com.cg.casestudy.carwash.document.Addons;
 import com.cg.casestudy.carwash.document.Packages;
 
+@Service
 public class AdminServiceImpl implements AdminService {
 
 	@Autowired
