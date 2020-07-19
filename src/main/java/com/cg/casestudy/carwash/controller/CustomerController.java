@@ -4,11 +4,14 @@ import java.util.Map;
 
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.cg.casestudy.carwash.beans.OrderBean;
 import com.cg.casestudy.carwash.document.Bookings;
 import com.cg.casestudy.carwash.document.Customer;
 import com.cg.casestudy.carwash.document.FutureBook;
@@ -68,7 +71,7 @@ public class CustomerController {
 	@PostMapping("/ratenow")
 	public boolean giveRatings(@RequestBody String ratingObject) {
 		JSONObject json = new JSONObject(ratingObject);
-		Rating rating = new Rating(json.getString("reviews"), json.getInt("ratings"));
+		Rating rating = new Rating(json.getString("bookingId"), "Customer", json.getString("reviews"), json.getInt("ratings"));
 		return customerService.giveRatings(rating, json.getString("bookingId"));
 	}
 //	
@@ -77,14 +80,25 @@ public class CustomerController {
 //		
 //	}
 //	
-//	@GetMapping
-//	public Customer getProfile() {
-//		return null;
-//	}
+	@PostMapping("/profile")
+	public Customer getProfile(@RequestBody String id) {
+		System.err.println(id);
+		return customerService.getProfile(new JSONObject(id).getString("id"));
+	}
 //	
-//	@PostMapping
-//	public void editProfile(Customer customer) {
-//		
-//	}
+	@PostMapping("/edit")
+	public Customer editProfile(@RequestBody Customer customer) {
+		if (customer==null) {
+			throw new CarwasherException("Invalid data for update");
+		}
+		else {
+			return customerService.editProfile(customer);
+		}
+	}
+	
+	@GetMapping("/orders/{emailId}")
+	public OrderBean getOrders(@PathVariable("emailId") String emailId) {
+		return customerService.getOrders(emailId);
+	}
 
 }

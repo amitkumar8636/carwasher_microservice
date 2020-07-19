@@ -1,9 +1,9 @@
 package com.cg.casestudy.carwash.document;
 
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.data.annotation.Id;
-import org.springframework.data.mongodb.core.mapping.DBRef;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 @Document
@@ -13,25 +13,20 @@ public class Washer {
 	private String id;
 	private String name;
 	private String email;
-	private boolean active;
+	private boolean isActive;
+	private List<Bookings> bookings;
+	private Map<String, String> bookingStatus;
 
-	@DBRef
-	private List<Order> orders;
-
-	public Washer(String name, String email, boolean active, List<Order> orders) {
+	public Washer(String name, String email) {
 		super();
-
 		this.name = name;
 		this.email = email;
-		this.active = active;
-		this.orders = orders;
+		this.isActive = true;
 	}
 
 	public String getId() {
 		return id;
 	}
-
-
 
 	public String getName() {
 		return name;
@@ -50,19 +45,31 @@ public class Washer {
 	}
 
 	public boolean isActive() {
-		return active;
+		return isActive;
 	}
 
-	public void setActive(boolean active) {
-		this.active = active;
+	public void setActive(boolean isActive) {
+		this.isActive = isActive;
 	}
 
-	public List<Order> getOrders() {
-		return orders;
+	public List<Bookings> getBookings() {
+		return bookings;
 	}
 
-	public void setOrders(List<Order> orders) {
-		this.orders = orders;
+	public void setBookings(List<Bookings> bookings) {
+		this.bookings = bookings;
 	}
+
+	public Map<String, String> getBookingStatus() {
+		return bookingStatus;
+	}
+
+	public void setBookingStatus(Map<String, String> bookingStatus) {
+		this.bookingStatus = bookingStatus;
+	}
+
+	
+
+	
 
 }

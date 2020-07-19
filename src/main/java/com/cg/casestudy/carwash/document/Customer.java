@@ -13,8 +13,7 @@ public class Customer {
 	private String name;
 	private String email;
 	private boolean isActive;
-	
-	
+
 	@DBRef
 	private List<Car> cars;
 

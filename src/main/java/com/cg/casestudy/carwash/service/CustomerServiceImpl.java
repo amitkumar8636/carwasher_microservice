@@ -4,12 +4,11 @@ import org.json.JSONException;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.web.bind.annotation.RequestBody;
 
+import com.cg.casestudy.carwash.beans.OrderBean;
 import com.cg.casestudy.carwash.document.Bookings;
 import com.cg.casestudy.carwash.document.Customer;
 import com.cg.casestudy.carwash.document.FutureBook;
-import com.cg.casestudy.carwash.document.Packages;
 import com.cg.casestudy.carwash.document.Rating;
 import com.cg.casestudy.carwash.document.Receipt;
 import com.cg.casestudy.carwash.document.User;
@@ -18,6 +17,7 @@ import com.cg.casestudy.carwash.repo.BookingRepo;
 import com.cg.casestudy.carwash.repo.CustomerRepo;
 import com.cg.casestudy.carwash.repo.FutureBookRepo;
 import com.cg.casestudy.carwash.repo.PackageRepo;
+import com.cg.casestudy.carwash.repo.RatingRepo;
 import com.cg.casestudy.carwash.repo.ReceiptRepo;
 import com.cg.casestudy.carwash.repo.UserRepo;
 
@@ -41,6 +41,9 @@ public class CustomerServiceImpl implements CustomerService {
 
 	@Autowired
 	private PackageRepo packageRepo;
+
+	@Autowired
+	private RatingRepo ratingRepo;
 
 	@Override
 	public Customer signup(JSONObject object) {
@@ -113,7 +116,19 @@ public class CustomerServiceImpl implements CustomerService {
 	public boolean giveRatings(Rating rating, String bookingId) {
 		Bookings booking = bookingRepo.findById(bookingId).get();
 		booking.setRating(rating);
+		ratingRepo.save(rating);
 		return bookingRepo.save(booking).getClass() == Bookings.class;
+	}
+
+	@Override
+	public Customer getProfile(String id) {
+		return customerRepo.findById(id).get();
+	}
+
+	@Override
+	public OrderBean getOrders(String emailId) {
+		return new OrderBean(bookingRepo.getAllBookingForUser(emailId),
+				futureBookRepo.getAllfuturebookForUser(emailId));
 	}
 
 }

@@ -12,12 +12,12 @@ public class Receipt {
 	@Id
 	private String id;
 	@DBRef
-	private Order order;
+	private Orders order;
 	private LocalDate date;
 	private float amount;
 	private String status;
 
-	public Receipt(Order order, LocalDate date, float amount, String status) {
+	public Receipt(Orders order, LocalDate date, float amount, String status) {
 		super();
 		this.order = order;
 		this.date = date;
@@ -29,11 +29,11 @@ public class Receipt {
 		return id;
 	}
 
-	public Order getOrder() {
+	public Orders getOrder() {
 		return order;
 	}
 
-	public void setOrder(Order order) {
+	public void setOrder(Orders order) {
 		this.order = order;
 	}
 
